@@ -1,5 +1,6 @@
 package com.codepath.apps.restclienttemplate
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
@@ -63,10 +64,22 @@ class TimelineActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.compose){
-            Toast.makeText(this,"Ready to compose tweet!",Toast.LENGTH_SHORT)
-                .show()
+            val intent = Intent(this,ComposeActivity::class.java)
+            startActivityForResult(intent,20)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode==RESULT_OK && requestCode == 20){
+            val tweet = data?.getParcelableExtra("tweet") as Tweet
+
+            tweets.add(0,tweet)
+
+            adapter.notifyItemInserted(0)
+            rvTweets.smoothScrollToPosition(0)
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
     fun populateTimeline(){
         client.getHomeTimeline(object: JsonHttpResponseHandler(){
